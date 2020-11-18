@@ -1,7 +1,7 @@
 config:
-  target: https://localhost:/5000
-  phases:
-    - duration: 10
+  target: "http://localhost:5000"
+  phases: 
+    - duration: 1
       arrivalRate: 60
 scenarios:
   - flow:
