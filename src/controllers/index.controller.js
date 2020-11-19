@@ -24,66 +24,66 @@ const getPermisos = async(req,res) => {
 }
 
 const createPermiso =  async(req,res)=> {
-
-    const {run} = req.body;
-    const resp = await pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[run])
-    .then(
-        async function(response){
-            // Verificacion de Permiso
-                if(response.rowCount != 1){
-                const {run,nombre,direccion,motivo,email} = req.body;
-                const date = new Date();
-                const fecha_inicio = new Date(date.getTime()+15*60000);
-                const fecha_termino = new Date(fecha_inicio.getTime()+120*60000);
-                const resp = await pool.query('INSERT INTO permisos VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING id',[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino])
-                .then(
-                    //Ejecutar si el Permiso Fue concedido
-                    async function(res){
-                        const idPermisoCreado = res.rows[0].id;
-                        const permiso = await generarPdf(req,idPermisoCreado,fecha_inicio,fecha_termino)
-                        if(sendPermiso(email,permiso)){
-                            res.json({
-                                message: 'Permiso generado exitosamente! \nID del permiso: '+id+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
-                                body: {
-                                    permiso: {run,nombre,direccion,motivo,email}
-                                }
-                            });
-                            }
-                        else{
-                            res.json({
-                                message: 'Ocurrio un error al generar su permiso'
-                            });
-                        }
-                    })
-                .catch(function (error) {
-                    if (error.response) {
-                        res.json({
-                            message: 'Ocurrio un error al generar su permiso'
-                        });
-                    }
-                });
-                
-            }else{
+    const verif = await verificarPermiso(req);
+    if(verif){
+        const {run,nombre,direccion,motivo,email} = req.body;
+        const date = new Date();
+        const fecha_inicio = new Date(date.getTime()+15*60000);
+        const fecha_termino = new Date(fecha_inicio.getTime()+120*60000);
+        const resp = await pool.query('INSERT INTO permisos VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING id',[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino])
+        .then(
+            resA=>{
+                const idPermisoCreado = resA.rows[0].id;
+                const nombrePermiso = generarPdf(req,idPermisoCreado,email,fecha_inicio,fecha_termino) 
                 res.json({
-                    message: 'Solo puede crear 1 permiso por dia!'
+                    message: 'Permiso generado exitosamente! \nID del permiso: '+idPermisoCreado+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
+                    body: {
+                        permiso: {run,nombre,direccion,motivo,email}
+                    }
+                }).bind(res); 
+            })
+        .catch(function (error) {
+            if (error.response) {
+                res.json({
+                    message: 'Ocurrio un error al generar su permiso'
                 });
             }
-        }   
-    ) 
-    .catch(function (error) {
+        });  
+    }else{
+        res.json({
+            message: 'Solo puede crear 1 permiso por dia!'
+        });
+    }
+};
+
+
+async function verificarPermiso (req){
+    const {run} = req.body;
+    const resp = await pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[run]).catch(function (error) {
         if (error.response) {
             res.json({
                 message: 'Ocurrio un error al generar su permiso'
             });
         }
     });
-};
+    //console.log(resp)
+    try {
+        rowCount = resp.rowCount
+    } catch (error) {
+        rowCount = 0
+    }
+    if(rowCount == 0){
+        return true
+    }else{
+        return false
+    }
+}
 
 
-async function generarPdf(req,id,fecha_inicio,fecha_termino){
+function generarPdf(req,id,email,fecha_inicio,fecha_termino){
     const {run,nombre,direccion,motivo} = req.body;
     const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream('permiso'+run+'.pdf'));
+    doc.pipe(fs.createWriteStream('src/Pdfs/permiso'+run+'.pdf'));
     doc
     .fontSize(25)
     .text('ID del permiso: '+id, {
@@ -110,7 +110,12 @@ async function generarPdf(req,id,fecha_inicio,fecha_termino){
         align: 'center'})    
     doc.end();
     console.log('se creo')
-    return 'permiso'+run+'.pdf'
+
+    //setTimeout(function () {
+        sendPermiso(email,'permiso'+run+'.pdf');
+    //}, 2000);
+    
+    //return 'permiso'+run+'.pdf'
 }
 
 
@@ -130,7 +135,7 @@ function sendPermiso (email, permiso){
         text: 'Adjunto se encuentra el PDF de su permiso.',
         attachments: [{
             filename:'permiso',
-            path:'../src/'+permiso,
+            path:'src/Pdfs/'+permiso,
             contentType: 'application/pdf'
           }]
     };
@@ -155,7 +160,6 @@ function deletePermiso(permiso){
     });  }catch(error){
     }
 }
-
 
 // Exports
 module.exports ={
