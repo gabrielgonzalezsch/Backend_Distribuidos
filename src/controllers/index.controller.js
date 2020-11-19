@@ -11,6 +11,7 @@ const pool = new Pool({
     port:'5432' 
 })
 
+
 const getPermisos = async(req,res) => {
     const response = await pool.query('SELECT * FROM permisos').catch(function (error) {
         if (error.response) {
@@ -22,78 +23,61 @@ const getPermisos = async(req,res) => {
     res.status(200).json(response)
 }
 
-const createPermiso = async (req,res)=> {
-    const verif = await verificarPermiso(req)
-    if(verif){
-        const {run,nombre,direccion,motivo,email} = req.body;
-        const date = new Date();
-        const fecha_inicio = new Date(date.getTime()+15*60000);
-        const fecha_termino = new Date(fecha_inicio.getTime()+120*60000);
-        const resp = await pool.query('INSERT INTO permisos VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7)',[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino]).catch(function (error) {
-            if (error.response) {
+const createPermiso =  async(req,res)=> {
+
+    const {run} = req.body;
+    const resp = await pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[run])
+    .then(
+        async function(response){
+            // Verificacion de Permiso
+                if(response.rowCount != 1){
+                const {run,nombre,direccion,motivo,email} = req.body;
+                const date = new Date();
+                const fecha_inicio = new Date(date.getTime()+15*60000);
+                const fecha_termino = new Date(fecha_inicio.getTime()+120*60000);
+                const resp = await pool.query('INSERT INTO permisos VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING id',[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino])
+                .then(
+                    //Ejecutar si el Permiso Fue concedido
+                    async function(res){
+                        const idPermisoCreado = res.rows[0].id;
+                        const permiso = await generarPdf(req,idPermisoCreado,fecha_inicio,fecha_termino)
+                        if(sendPermiso(email,permiso)){
+                            res.json({
+                                message: 'Permiso generado exitosamente! \nID del permiso: '+id+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
+                                body: {
+                                    permiso: {run,nombre,direccion,motivo,email}
+                                }
+                            });
+                            }
+                        else{
+                            res.json({
+                                message: 'Ocurrio un error al generar su permiso'
+                            });
+                        }
+                    })
+                .catch(function (error) {
+                    if (error.response) {
+                        res.json({
+                            message: 'Ocurrio un error al generar su permiso'
+                        });
+                    }
+                });
+                
+            }else{
                 res.json({
-                    message: 'Ocurrio un error al generar su permiso'
+                    message: 'Solo puede crear 1 permiso por dia!'
                 });
             }
-        });
-
-        id = await getId(req,fecha_inicio)
-        const permiso = await generarPdf(req,id,fecha_inicio,fecha_termino)
-        if(sendPermiso(email,permiso)){
-            res.json({
-                message: 'Permiso generado exitosamente! \nID del permiso: '+id+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
-                body: {
-                    permiso: {run,nombre,direccion,motivo,email}
-                }
-            });
-            }
-        else{
-            res.json({
-                message: 'Ocurrio un error al generar su permiso'
-            });
-        }
-    }else{
-        res.json({
-            message: 'Solo puede crear 1 permiso por dia!'
-        });
-    }
-};
-
-async function getId(req,fechaInicio){
-    const {run,nombre,direccion,motivo,email} = req.body;
-    const resid = await pool.query('SELECT id FROM permisos WHERE run =$1 AND nombre=$2 AND direccion=$3 AND fechaInicio=$4 LIMIT 1',[run,nombre,direccion,fechaInicio]).catch(function (error) {
-        if (error.response) {
-            res.json({
-                message: 'Ocurrio un error al generar su permiso'
-            });
-        }
-    });  
-    return resid.rows[0].id 
-}
-
-
-async function verificarPermiso (req){
-    const {run} = req.body;
-    const resp = await pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[run]).catch(function (error) {
+        }   
+    ) 
+    .catch(function (error) {
         if (error.response) {
             res.json({
                 message: 'Ocurrio un error al generar su permiso'
             });
         }
     });
-    console.log(resp)
-    try {
-        rowCount = resp.rowCount
-    } catch (error) {
-        rowCount = 0
-    }
-    if(rowCount == 0){
-        return true
-    }else{
-        return false
-    }
-}
-
+};
 
 
 async function generarPdf(req,id,fecha_inicio,fecha_termino){
