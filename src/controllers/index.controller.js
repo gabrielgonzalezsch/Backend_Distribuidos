@@ -83,7 +83,7 @@ async function verificarPermiso (req){
 function generarPdf(req,id,email,fecha_inicio,fecha_termino){
     const {run,nombre,direccion,motivo} = req.body;
     const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream('src/Pdfs/permiso'+run+'.pdf'));
+    doc.pipe(fs.createWriteStream('../src/Pdfs/permiso'+run+'.pdf'));
     doc
     .fontSize(25)
     .text('ID del permiso: '+id, {
@@ -135,7 +135,7 @@ function sendPermiso (email, permiso){
         text: 'Adjunto se encuentra el PDF de su permiso.',
         attachments: [{
             filename:'permiso',
-            path:'src/Pdfs/'+permiso,
+            path:'../src/Pdfs/'+permiso,
             contentType: 'application/pdf'
           }]
     };
