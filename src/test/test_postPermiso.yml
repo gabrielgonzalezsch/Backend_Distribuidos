@@ -1,16 +1,16 @@
 config:
-  target: "http://localhost:5000"
+  target: "http://142.93.127.0:5000"
   phases: 
-    - duration: 1
-      arrivalRate: 60
+    - duration: 10
+      arrivalRate: 150
 scenarios:
   - flow:
       - post:
           url: "/createPermiso"
           json:
-            run: '9302874-0'
-            nombre: 'carlos'
-            direccion: 'el pequen 099'
-            motivo: 'comprar al super'
+            run: '15.913.088-6'
+            nombre: 'Carlos Perez'
+            direccion: 'Estacion Central, Av falsa 091'
+            motivo: 'Comprar medicina'
             email: 'carlos@gmail.com'
             

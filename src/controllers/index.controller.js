@@ -7,7 +7,7 @@ const pool = new Pool({
     host: 'localhost',
     user: 'postgres',
     password:'canito',
-    database: 'comisaria',
+    database: 'postgres',
     port:'5432' 
 })
 
@@ -20,7 +20,7 @@ const getPermisos = async(req,res) => {
             });
         }
       });
-    res.status(200).json(response)
+    res.status(200).send(response)
 }
 
 const createPermiso =  async(req,res)=> {
