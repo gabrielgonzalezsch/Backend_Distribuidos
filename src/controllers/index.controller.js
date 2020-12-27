@@ -6,21 +6,21 @@ const fs = require('fs');
 const pool = new Pool({
     host: '35.193.187.180',
     user: 'postgres',
-    password:'canito123',
+    password:'canito12',
     database: 'comisaria',
     port:'5432' 
 })
 
 
 const getPermisos = async(req,res) => {
-    const response = await pool.query('SELECT * FROM permisos').catch(function (error) {
+    /*const response = await pool.query('SELECT * FROM permisos').catch(function (error) {
         if (error.response) {
             res.json({
                 message: 'Ocurrio un error'
             });
         }
-      });
-    res.status(200).send(response)
+      });*/
+    res.status(200).send("HOLi")
 }
 
 const createPermiso =  async(req,res)=> {
