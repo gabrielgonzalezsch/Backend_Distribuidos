@@ -4,9 +4,9 @@ const PDFDocument = require('pdfkit')
 const fs = require('fs');
 
 const pool = new Pool({
-    host: 'localhost',
+    host: '35.193.187.180',
     user: 'postgres',
-    password:'canito',
+    password:'canito123',
     database: 'comisaria',
     port:'5432' 
 })
