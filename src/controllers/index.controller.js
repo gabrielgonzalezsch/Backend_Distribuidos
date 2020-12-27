@@ -13,15 +13,14 @@ const pool = new Pool({
 
 
 const getPermisos = async(req,res) => {
-    /*const response = await pool.query('SELECT * FROM permisos').catch(function (error) {
+    const response = await pool.query('SELECT * FROM permisos').catch(function (error) {
         if (error.response) {
             res.json({
                 message: 'Ocurrio un error'
             });
         }
       });
-    res.status(200).send(response)*/
-    console.log("asdjkkkkkkkkkkkkkkkk")
+    res.status(200).send(response)
 }
 
 const createPermiso =  async(req,res)=> {
