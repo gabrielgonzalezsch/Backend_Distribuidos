@@ -1,13 +1,15 @@
-const express = require('express')
-const os = require('os')
+const express = require('express');
+const app = express();
 
-const app = express()
-app.get('/', (req, res) => {
-        res.send(`Hi from ${os.hostname()}!`)
-})
 
-const port = 5000
-app.listen(port, () => console.log(`listening on port ${port}`))
+//middlewares
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+
+
 //routes
 app.use(require('./routes/index'));
 
+
+app.listen(5000);
+console.log('Server on port 5000')
