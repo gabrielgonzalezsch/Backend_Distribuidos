@@ -2,6 +2,7 @@ const { Pool } = require('pg')
 const nodemailer = require('nodemailer')
 const PDFDocument = require('pdfkit')
 const fs = require('fs');
+const { response } = require('express');
 
 const pool = new Pool({
     host: '34.121.156.137',
@@ -11,72 +12,52 @@ const pool = new Pool({
     port:'5432' 
 })
 
-
-const getPermisos = async(req,res) => {
-    const response = await pool.query('SELECT * FROM permisos').catch(function (error) {
-        if (error.response) {
-            res.json({
-                message: 'Ocurrio un error'
-            });
+const getPermisos = (request,response) => {
+    pool.query('SELECT * FROM permisos',(error,results) =>{
+        if(error){
+            throw error
         }
-      });
-    res.status(200).send(response)
+        response.status(200).send(results)
+    })
 }
 
-const createPermiso =  async(req,res)=> {
-    const verif = await verificarPermiso(req);
-    if(verif){
-        const {run,nombre,direccion,motivo,email} = req.body;
-        const date = new Date();
-        const fecha_inicio = new Date(date.getTime()+15*60000);
-        const fecha_termino = new Date(fecha_inicio.getTime()+120*60000);
-        const resp = await pool.query('INSERT INTO permisos VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING id',[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino])
-        .then(
-            resA=>{
-                const idPermisoCreado = resA.rows[0].id;
-                const nombrePermiso = generarPdf(req,idPermisoCreado,email,fecha_inicio,fecha_termino) 
-                res.json({
-                    message: 'Permiso generado exitosamente! \nID del permiso: '+idPermisoCreado+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
-                    body: {
-                        permiso: {run,nombre,direccion,motivo,email}
+const createPermiso = (request,response)=> {
+    pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[request.body.run],(error, results) => {
+        if(error){
+            throw error
+        }else{
+            if(results.rowCount == 0){
+                const {run,nombre,direccion,motivo,email} = request.body; 
+                const date = new Date();
+                const fecha_inicio = new Date(date.getTime()+15*60000);
+                const fecha_termino = new Date(fecha_inicio.getTime()+120*60000);
+                pool.query(
+                    'INSERT INTO permisos VALUES (DEFAULT,$1,$2,$3,$4,$5,$6,$7) RETURNING id'
+                    ,[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino]
+                    ,(error,results) =>{
+                        if(error){
+                            response.json({
+                                message: 'Ocurrio un error al generar su permiso'
+                            });
+                        }
+                        const idPermisoCreado = results.rows[0].id;
+                        const nombrePermiso = generarPdf(request,idPermisoCreado,email,fecha_inicio,fecha_termino) 
+                        response.json({
+                            message: 'Permiso generado exitosamente! \nID del permiso: '+idPermisoCreado+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
+                            body: {
+                                permiso: {run,nombre,direccion,motivo,email}
+                            }
+                        })
+                        response.status(200).send("Creado")
                     }
-                }).bind(res); 
-            })
-        .catch(function (error) {
-            if (error.response) {
-                res.json({
-                    message: 'Ocurrio un error al generar su permiso'
+                )
+            }else{
+                response.json({
+                    message: 'Solo puede crear 1 permiso por dia!'
                 });
             }
-        });  
-    }else{
-        res.json({
-            message: 'Solo puede crear 1 permiso por dia!'
-        });
-    }
-};
-
-
-async function verificarPermiso (req){
-    const {run} = req.body;
-    const resp = await pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[run]).catch(function (error) {
-        if (error.response) {
-            res.json({
-                message: 'Ocurrio un error al generar su permiso'
-            });
-        }
-    });
-    //console.log(resp)
-    try {
-        rowCount = resp.rowCount
-    } catch (error) {
-        rowCount = 0
-    }
-    if(rowCount == 0){
-        return true
-    }else{
-        return false
-    }
+        } 
+    })
 }
 
 
@@ -112,12 +93,11 @@ function generarPdf(req,id,email,fecha_inicio,fecha_termino){
     console.log('se creo')
 
     //setTimeout(function () {
-        sendPermiso(email,'permiso'+run+'.pdf');
+        //sendPermiso(email,'permiso'+run+'.pdf');
     //}, 2000);
     
     //return 'permiso'+run+'.pdf'
 }
-
 
 function sendPermiso (email, permiso){
     var verif = true;
