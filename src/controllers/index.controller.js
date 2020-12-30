@@ -24,8 +24,7 @@ const getPermisos = (request,response) => {
 const createPermiso = (request,response)=> {
     pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[request.body.run],(error, results) => {
         if(error){
-            response.status(500).send("error")
-            return
+            return response.status(500).send("error");
         }else{
             if(results.rowCount == 0){
                 const {run,nombre,direccion,motivo,email} = request.body; 
@@ -37,27 +36,28 @@ const createPermiso = (request,response)=> {
                     ,[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino]
                     ,(error,results) =>{
                         if(error){
-                            response.json({
+                            return response.status(500).send("error").json({
                                 message: 'Ocurrio un error al generar su permiso'
                             });
                         }
-                        const idPermisoCreado = results.rows[0].id;
-                        const nombrePermiso = generarPdf(request,idPermisoCreado,email,fecha_inicio,fecha_termino) 
-                        response.json({
-                            message: 'Permiso generado exitosamente! \nID del permiso: '+idPermisoCreado+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
-                            body: {
-                                permiso: {run,nombre,direccion,motivo,email}
-                            }
-                        });
+                        else{
+                            const idPermisoCreado = results.rows[0].id;
+                            const nombrePermiso = generarPdf(request,idPermisoCreado,email,fecha_inicio,fecha_termino) 
+                            return response.status(500).send("exito").json({
+                                message: 'Permiso generado exitosamente! \nID del permiso: '+idPermisoCreado+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
+                                body: {
+                                    permiso: {run,nombre,direccion,motivo,email}
+                                }
+                            });
+                        }
                     }
                 )
             }else{
-                response.json({
+                return response.json({
                     message: 'Solo puede crear 1 permiso por dia!'
-                });
-            }
-            
-        } 
+                }).status(500).send("error");
+                }
+            } 
     })
 }
 
