@@ -17,14 +17,16 @@ const getPermisos = (request,response) => {
         if(error){
             throw error
         }
-        response.status(200).send(results)
+        response.status(200).send(results).json({
+            message: 'Ocurrio un error con la BD'
+        });
     })
 }
 
 const createPermiso = (request,response)=> {
     pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[request.body.run],(error, results) => {
         if(error){
-            return response.status(500).send("error");
+            return response.status(500);
         }else{
             if(results.rowCount == 0){
                 const {run,nombre,direccion,motivo,email} = request.body; 
@@ -36,14 +38,14 @@ const createPermiso = (request,response)=> {
                     ,[run,nombre,direccion,motivo,email,fecha_inicio,fecha_termino]
                     ,(error,results) =>{
                         if(error){
-                            return response.status(500).send("error").json({
+                            return response.status(200).json({
                                 message: 'Ocurrio un error al generar su permiso'
                             });
                         }
                         else{
                             const idPermisoCreado = results.rows[0].id;
                             const nombrePermiso = generarPdf(request,idPermisoCreado,email,fecha_inicio,fecha_termino) 
-                            return response.status(500).send("exito").json({
+                            return response.status(200).json({
                                 message: 'Permiso generado exitosamente! \nID del permiso: '+idPermisoCreado+'\nFecha de inicio: '+fecha_inicio.toString()+'\nFecha de termino: '+fecha_termino.toString(),
                                 body: {
                                     permiso: {run,nombre,direccion,motivo,email}
@@ -53,9 +55,9 @@ const createPermiso = (request,response)=> {
                     }
                 )
             }else{
-                return response.json({
-                    message: 'Solo puede crear 1 permiso por dia!'
-                }).status(500).send("error");
+                return response.status(200).json({
+                    message: 'Ocurrio un error al generar su permiso'
+                });
                 }
             } 
     })
