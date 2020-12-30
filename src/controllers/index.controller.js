@@ -17,16 +17,14 @@ const getPermisos = (request,response) => {
         if(error){
             throw error
         }
-        response.status(200).send(results).json({
-            message: 'Ocurrio un error con la BD'
-        });
+        response.status(200).send(results);
     })
 }
 
 const createPermiso = (request,response)=> {
     pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[request.body.run],(error, results) => {
         if(error){
-            return response.status(500);
+            return response.status(200);
         }else{
             if(results.rowCount == 0){
                 const {run,nombre,direccion,motivo,email} = request.body; 
@@ -56,7 +54,7 @@ const createPermiso = (request,response)=> {
                 )
             }else{
                 return response.status(200).json({
-                    message: 'Ocurrio un error al generar su permiso'
+                    message: 'Solo se permite 1 permiso por dia!'
                 });
                 }
             } 
