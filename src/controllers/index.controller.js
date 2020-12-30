@@ -24,7 +24,8 @@ const getPermisos = (request,response) => {
 const createPermiso = (request,response)=> {
     pool.query('SELECT fechaInicio FROM permisos WHERE run = $1 AND fechaInicio > now() - interval \'1 day\' ORDER BY id DESC LIMIT 1  ',[request.body.run],(error, results) => {
         if(error){
-            throw error
+            response.status(500).send("error")
+            return
         }else{
             if(results.rowCount == 0){
                 const {run,nombre,direccion,motivo,email} = request.body; 
@@ -47,8 +48,7 @@ const createPermiso = (request,response)=> {
                             body: {
                                 permiso: {run,nombre,direccion,motivo,email}
                             }
-                        })
-                        response.status(200).send("Creado")
+                        });
                     }
                 )
             }else{
@@ -56,6 +56,7 @@ const createPermiso = (request,response)=> {
                     message: 'Solo puede crear 1 permiso por dia!'
                 });
             }
+            
         } 
     })
 }
@@ -64,7 +65,7 @@ const createPermiso = (request,response)=> {
 function generarPdf(req,id,email,fecha_inicio,fecha_termino){
     const {run,nombre,direccion,motivo} = req.body;
     const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream('../src/Pdfs/permiso'+run+'.pdf'));
+    doc.pipe(fs.createWriteStream('src/Pdfs/permiso'+run+'.pdf'));
     doc
     .fontSize(25)
     .text('ID del permiso: '+id, {
@@ -90,13 +91,10 @@ function generarPdf(req,id,email,fecha_inicio,fecha_termino){
         width: 410,
         align: 'center'})    
     doc.end();
-    console.log('se creo')
 
-    //setTimeout(function () {
-        //sendPermiso(email,'permiso'+run+'.pdf');
-    //}, 2000);
+    sendPermiso(email,'permiso'+run+'.pdf');
     
-    //return 'permiso'+run+'.pdf'
+    return 'permiso'+run+'.pdf'
 }
 
 function sendPermiso (email, permiso){
@@ -115,7 +113,7 @@ function sendPermiso (email, permiso){
         text: 'Adjunto se encuentra el PDF de su permiso.',
         attachments: [{
             filename:'permiso',
-            path:'../src/Pdfs/'+permiso,
+            path:'src/Pdfs/'+permiso,
             contentType: 'application/pdf'
           }]
     };
