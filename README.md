@@ -48,6 +48,10 @@ Para esta segunda entrega se implementaron las siguientes características:
 
 ## Diagrama de Componentes
 
+https://raw.githubusercontent.com/usuario/repositorio/rama/ruta/al/asset
+
+
+!(https://raw.githubusercontent.com/gabrielgonzalezsch/Backend_Distribuidos/main/Imagen 1.PNG)
 
 
 
