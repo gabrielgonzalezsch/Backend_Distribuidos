@@ -20,16 +20,10 @@ Con el objetivo de aplicar los conocimientos adquiridos en cátedra, para esta s
     
 - **Transparencia:** 
     - **Ubicación:** Para solventar esta característica se puede dotar al sistema de una dirección, o dominio DNS, que permita identificar y reconocer fácilmente el sistema dentro de la WEB.
-
     - **Re-Localización:** Esta característica se puede satisfacer con la misma implementación del punto anterior, es decir, que con el protocolo DNS, se puede solventar la reubicación del sitio web de la aplicación. En consecuencia de lo anterior, se mantendrá la transparencia hacia al cliente con el mismo dominio anteriormente utilizado.
-
     - **Migración:** Esta característica se puede lograr con el uso de docker, herramienta que genera un ambiente de encapsulamiento, para cada módulo de la aplicación. Esta tecnología es altamente configurable, y permite levantar el módulo sin importar el sistema operativo en que se esté ejecutando.
-
     - **Replicación:** Como se mencionó anteriormente en el apartado de disponibilidad, se puede hacer uso de la replicación (tanto en la base de datos como en los recursos) para entregar transparencia al usuario.
-
     - **Falla:** Con el uso de los servicios de Google Cloud, se puede transparentar fácilmente todos los fallos que presenten los nodos, workloads y contenedores de la aplicación, esto por medio de las herramientas que ofrece el servicio, tales como registros gráficos o LOGs que permiten el detallado específico de cada componente.
-    
-    
     
 - **Escalabilidad:**
     - **Horizontal:** Esta característica se puede solventar haciendo uso  de la herramienta Docker, en conjunto con los servicios de Kubernetes entregados por Google Cloud. Este último permite una auto-escalabilidad, haciendo uso de contenedores aislados, repartidos dentro de una cierta cantidad de nodos, los cuales pueden auto balancear la carga ejercida en el sistema, esto acorde con la carga de tráfico que presente el sistema.
@@ -50,7 +44,6 @@ Para esta segunda entrega se implementaron las siguientes características:
     - **Replicación:** Al aplicar la estructura de maestro-esclavo en la base de datos, se puede contar con una alta replicación de los datos dentro del sistema. Por otro lado, la utilización de GKE permite una replicación de los recursos y servicios para la disposición de la aplicación.
 - **Escalabilidad:**
     - **Horizontal/Vertical:** El servicio de GKE permite la escalabilidad horizontal y vertical, esto en el sentido de la asignación de recursos requeridos, lo que haría referencia al auto-escalamiento vertical, como también al balanceo del tráfico dentro de los pods, lo que permite el auto-escalamiento horizontal.
-
 
 
 ## Diagrama de Componentes
