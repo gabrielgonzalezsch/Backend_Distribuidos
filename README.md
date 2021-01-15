@@ -48,7 +48,7 @@ Para esta segunda entrega se implementaron las siguientes características:
 
 ## Diagrama de Componentes
 
-![](https://ibb.co/dJXP66v)
+![](https://i.ibb.co/k6z400T/Imagen-1.png)
 
 
 ## Diagrama de Despliegue  
