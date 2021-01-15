@@ -53,5 +53,7 @@ Para esta segunda entrega se implementaron las siguientes características:
 
 ## Diagrama de Despliegue  
 
+![](https://i.ibb.co/MStgTkM/imagen-2.png)
 
 
+## Test Artillery
