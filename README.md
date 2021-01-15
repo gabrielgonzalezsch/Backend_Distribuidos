@@ -57,3 +57,25 @@ Para esta segunda entrega se implementaron las siguientes características:
 
 
 ## Test Artillery
+Para ver la capacidad de procesamiento del servidor, se decidio hacer uso de Artillery, herramienta que permite crear simular peticiones con tal de analizar las metricas de rendimiento que posee la aplicación o pagina. Para lo anterior, se decidio generar 2 archivos para los scripts de las pruebas, el primero es una peticion POST para generar un permiso a partir de un usuario ficticio, por otro lado, el segundo es una peticion GET para obtener los permisos que se encuentren almacenados en el sistema.
+
+#### **POST**
+
+![](https://i.ibb.co/xYrrX1v/testpost.png)
+
+De las solicitudes, se puede apreciar:
+- De las 1500 solicitudes, se completaron exitosamente 1500, teniendo un 100% de exito en las consultas.
+- El tiempo promedio de respuesta fue de 4389.4 ms por solicitud, con una máxima de  41158.4 ms, y mínima 328 ms.
+
+#### **GET**
+![](https://i.ibb.co/rbT65nZ/testget.png)
+
+De las solicitudes, se desprenden los siguientes datos:
+- De las 1500 solicitudes, se completaron exitosamente 1210, fallando aproximadamente en 19% de los casos.
+- El tiempo promedio de respuesta fue de 6825 ms por solicitud, con una máxima de 104106.7 ms y mínima de 323.9 ms
+
+
+Podemos concluir que existio un notable mejoramiento del performance de la consulta POST, y en caso contrario de la consulta GET. Lo anterior se puede justificar, debido a que las pruebas de la primera PEP fueron todas dentro de un ambiente local, lo cual favorecio el tiempo de respuesta de la consulta GET. Por otro lado, en esta segunda entrega podemos destacar que tener la aplicacion dentro de un GKE mejora el rendimiento en el balanceo de carga de la consulta POST.
+
+
+
