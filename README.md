@@ -55,8 +55,13 @@ Para esta segunda entrega se implementaron las siguientes características:
 - **Transparencia:**
     - **Migración:** Con el uso de docker la migración de esta aplicación se puede realizar con una gran facilidad, ya que basta solo con levantar la imagen de la aplicación por medio de un Dockerfile, dentro de cualquier ambiente que tenga soporte para esta herramienta.
     - **Replicación:** Al aplicar la estructura de maestro-esclavo en la base de datos, se puede contar con una alta replicación de los datos dentro del sistema. Por otro lado, la utilización de GKE permite una replicación de los recursos y servicios para la disposición de la aplicación.
+
+- **Apertura:**
+    - **Portabilidad:** El uso de imagenes docker permitio mejorar la portabilidad que presentaba originalmente el sistema.
+
 - **Escalabilidad:**
     - **Horizontal/Vertical:** El servicio de GKE permite la escalabilidad horizontal y vertical, esto en el sentido de la asignación de recursos requeridos, lo que haría referencia al auto-escalamiento vertical, como también al balanceo del tráfico dentro de los pods, lo que permite el auto-escalamiento horizontal.
+
 
 
 ## Diagrama de Componentes
