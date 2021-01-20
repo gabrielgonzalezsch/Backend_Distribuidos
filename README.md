@@ -71,7 +71,7 @@ Para esta segunda entrega se implementaron las siguientes características:
 
 ## Diagrama de Despliegue  
 
-![](https://i.ibb.co/MStgTkM/imagen-2.png)
+![](https://i.ibb.co/ccnwvCS/Ana-lisis-esquema-tico-de-la-decisio-n-de-inversio-n-Diagrama-de-despliegue.png)
 
 
 ## Test Artillery
