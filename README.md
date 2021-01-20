@@ -1,5 +1,18 @@
 ![](https://i.ibb.co/sCHRR2w/front.png)
 
+#### **Front** 
+http://35.238.72.67:3000/
+
+#### **Back**
+http://34.121.111.178:5000/
+
+#### **BD Maestra**
+http://34.72.210.185:55432/
+
+#### **BD Esclavo**
+http://34.72.210.185:65432/
+
+
 # PEP 2 Sistemas Distribuidos 
 Con el objetivo de aplicar los conocimientos adquiridos en cátedra, para esta segunda entrega se procederá a implementar, en lo posible,  la mayor cantidad de características propias de un sistema distribuido dentro de la aplicación. Algunas de las características que no cumple el sistema anteriormente implementado son:
 - **Disponibilidad**
