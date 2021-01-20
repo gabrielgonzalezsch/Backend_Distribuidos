@@ -1,6 +1,6 @@
+![](https://i.ibb.co/sCHRR2w/front.png)
+
 # PEP 2 Sistemas Distribuidos 
-
-
 Con el objetivo de aplicar los conocimientos adquiridos en cátedra, para esta segunda entrega se procederá a implementar, en lo posible,  la mayor cantidad de características propias de un sistema distribuido dentro de la aplicación. Algunas de las características que no cumple el sistema anteriormente implementado son:
 - **Disponibilidad**
 - **Transparencia:** 
